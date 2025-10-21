@@ -1,6 +1,7 @@
 package com.crm.security.user;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -10,7 +11,11 @@ import java.util.Collection;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * @author alani
+ */
 @Data
+@AllArgsConstructor
 public class ManagerDetail implements UserDetails {
     private static final long serialVersionUID = 1L;
 
@@ -20,6 +25,9 @@ public class ManagerDetail implements UserDetails {
     private String realName;
     private Integer status;
     private String username;
+    private Long deptId;
+    private String deptName;
+    private String deptParentIds;
 
     /**
      * 帐户是否过期
@@ -41,6 +49,10 @@ public class ManagerDetail implements UserDetails {
      * 拥有权限集合
      */
     private Set<String> authoritySet;
+
+    public ManagerDetail() {
+
+    }
 
     @Override
     @JsonIgnore
@@ -67,4 +79,5 @@ public class ManagerDetail implements UserDetails {
     public boolean isEnabled() {
         return this.isEnabled;
     }
+
 }

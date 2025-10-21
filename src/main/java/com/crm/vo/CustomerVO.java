@@ -92,4 +92,7 @@ public class CustomerVO {
     @Schema(description = "创建时间")
     @JsonFormat(pattern = DateUtils.DATE_TIME_PATTERN)
     private LocalDateTime createTime;
+
+    @Schema(description = "所属销售部门名称")
+    private String ownerDeptName;
 }

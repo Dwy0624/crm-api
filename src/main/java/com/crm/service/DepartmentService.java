@@ -40,9 +40,13 @@ public interface DepartmentService extends IService<Department> {
      */
     void saveOrEditDepartment(Department department) throws ServerException;
 
+
+
     /**
      * 删除部门
      * @param query
      */
     void removeDepartment(IdQuery query) throws ServerException;
+
+    List<Integer> getDeptAndChildrenIds(Integer deptId);
 }

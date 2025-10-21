@@ -159,4 +159,25 @@ public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Departm
         removeBatchByIds(departments);
     }
 
+    // DepartmentServiceImpl.java 实现子部门查询
+    @Override
+    public List<Integer> getDeptAndChildrenIds(Integer deptId) {
+        List<Integer> result = new ArrayList<>();
+        // 收集当前部门
+        result.add(deptId);
+        // 递归收集子部门
+        collectChildren(deptId, result);
+        return result;
+    }
+
+    private void collectChildren(Integer parentId, List<Integer> result) {
+        LambdaQueryWrapper<Department> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(Department::getParentId, parentId);
+        List<Department> children = baseMapper.selectList(wrapper);
+        for (Department child : children) {
+            result.add(child.getId());
+            collectChildren(child.getId(), result);
+            // 递归查询子部门
+        }
+    }
 }

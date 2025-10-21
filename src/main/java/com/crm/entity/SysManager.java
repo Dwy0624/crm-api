@@ -44,6 +44,8 @@ public class SysManager {
     @TableField(value = "update_time", fill = FieldFill.INSERT_UPDATE)
     private LocalDateTime updateTime;
 
+    @TableField(value = "depart_id", fill = FieldFill.INSERT_UPDATE)
+    private Integer departId;
 
 
 }

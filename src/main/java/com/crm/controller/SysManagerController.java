@@ -4,16 +4,21 @@ import cn.hutool.core.util.StrUtil;
 import com.crm.common.exception.ServerException;
 import com.crm.common.result.PageResult;
 import com.crm.common.result.Result;
+import com.crm.entity.Department;
 import com.crm.query.ChangePasswordQuery;
 import com.crm.query.SysManagerQuery;
 import com.crm.security.user.ManagerDetail;
 import com.crm.security.user.SecurityUser;
+import com.crm.service.DepartmentService;
 import com.crm.service.SysManagerService;
+import com.crm.vo.DeptInfoVO;
 import com.crm.vo.SysManagerVO;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -38,6 +43,8 @@ public class SysManagerController {
     private final SysManagerService sysManagerService;
 
     private final PasswordEncoder passwordEncoder;
+
+    private final DepartmentService departmentService;
 
 
     @PostMapping("page")
@@ -110,4 +117,25 @@ public class SysManagerController {
         sysManagerService.changePassword(query);
         return Result.ok();
     }
+
+    // SysManagerController.java 新增
+    @PostMapping("getUserDeptInfo")
+    @Operation(summary = "获取当前用户部门信息")
+    public Result<DeptInfoVO> getUserDeptInfo() {
+        ManagerDetail manager = SecurityUser.getManager();
+        Department dept = departmentService.getById(manager.getDeptId());
+        if (dept == null) {
+            return Result.error("用户未分配部门");
+        }
+
+        DeptInfoVO vo = new DeptInfoVO();
+        vo.setDeptId(dept.getId());
+        vo.setDeptName(dept.getName());
+        vo.setParentIds(dept.getParentIds());
+        // 获取可查看的部门范围
+        vo.setAccessibleDeptIds(departmentService.getDeptAndChildrenIds(dept.getId()));
+        return Result.ok(vo);
+    }
+
+
 }

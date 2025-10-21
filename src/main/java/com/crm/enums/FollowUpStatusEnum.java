@@ -5,6 +5,10 @@ import lombok.Getter;
 
 import java.util.Objects;
 
+/**
+ * @author alani
+ */
+
 @Getter
 @AllArgsConstructor
 public enum FollowUpStatusEnum {
