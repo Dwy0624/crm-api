@@ -17,4 +17,6 @@ public class LeadQuery extends Query {
     private Integer followStatus;
     @Schema(description = "线索状态")
     private Integer status;
+    @Schema(description = "客户来源")
+    private String source;
 }
