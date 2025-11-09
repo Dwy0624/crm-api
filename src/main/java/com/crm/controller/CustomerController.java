@@ -5,6 +5,7 @@ import com.crm.common.result.PageResult;
 import com.crm.common.result.Result;
 import com.crm.enums.BusinessType;
 import com.crm.query.CustomerQuery;
+import com.crm.query.CustomerTrendQuery;
 import com.crm.query.IdQuery;
 import com.crm.service.CustomerService;
 import com.crm.vo.CustomerVO;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.rmi.ServerException;
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -76,5 +78,13 @@ public class CustomerController {
     public Result publicPoolToPrivate(@RequestBody @Validated IdQuery idQuery) throws ServerException {
         customerService.publicPoolToPrivate(idQuery);
         return Result.ok();
+    }
+
+
+    @PostMapping("/trendData")
+    @Operation(summary = "客户变化趋势数据")
+    @Log(title = "客户变化趋势", businessType = BusinessType.SELECT)
+    public Result<Map<String, List>> getCustomerTrendData(@RequestBody CustomerTrendQuery query) {
+        return Result.ok(customerService.getCustomerTrend(query));
     }
 }

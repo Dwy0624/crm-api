@@ -17,10 +17,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils; // 添加此行
 import org.aspectj.lang.JoinPoint;
-import org.aspectj.lang.annotation.AfterReturning;
-import org.aspectj.lang.annotation.AfterThrowing;
-import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.annotation.Before;
+import org.aspectj.lang.annotation.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.NamedThreadLocal;
@@ -31,6 +28,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.Collection;
 import java.util.Map;
 import org.springframework.http.HttpMethod;
+
+
 /**
  * @author alani
  */
@@ -46,79 +45,73 @@ public class LogAspect {
     private static final ThreadLocal<Long> TIME_THREADLOCAL = new NamedThreadLocal<>("Cost Time");
 
     private final OperLogService operLogService;
-//4.记录操作日志
     @Before(value = "@annotation(controllerLog)")
     public void doBefore(JoinPoint joinPoint, Log controllerLog) {
         TIME_THREADLOCAL.set(System.currentTimeMillis());
     }
-//5.记录操作结果
+
     @AfterReturning(pointcut = "@annotation(controllerLog)",returning = "jsonResult")
     public void doAfterReturning(JoinPoint joinPoint, Log controllerLog, Object jsonResult) {
         handleLog(joinPoint, controllerLog, null, jsonResult);
     }
-//6.记录操作异常
+
     @AfterThrowing(pointcut = "@annotation(controllerLog)",throwing = "e")
     public void doAfterThrowing(JoinPoint joinPoint, Log controllerLog, Exception e) {
         handleLog(joinPoint, controllerLog, e, null);
     }
-    public void getControllerMethodDescription(JoinPoint joinPoint,Log  log,OperLog operLog,Object jsonResult) throws Exception {
-        //设置模块名称
-        operLog.setTitle(log.title());
-        //请求操作类型
-        operLog.setOperType(log.businessType().ordinal());
-        //是否需要保存request 请求参数
-        if (log.isSaveRequestData()) {
-            setRequestValue(joinPoint, operLog, log.excludeParamNames());
-        }
-        //是否需要保存response结果
-        if (log.isSaveResponseData()) {
-            operLog.setJsonResult(StringUtils.substring(JSON.toJSONString(jsonResult, excludePropertyPreFilter(EXCLUDE_PROPERTIES)), 0, 2000));
-        }
-    }
 
-
-    protected void handleLog(final JoinPoint joinPoint,Log controllerLog,final Exception e,Object jsonResult) {
+    protected void handleLog(final JoinPoint joinPoint, Log controllerLog, final Exception e, Object jsonResult) {
         try {
-            //获取当前的用户
+            // 获取当前的用户
             ManagerDetail loginManager = SecurityUser.getManager();
-            //**********数据库日志**********
+
+            // ******=====数据库日志=====****
             OperLog operLog = new OperLog();
             operLog.setStatus(BusinessStatus.SUCCESS.ordinal());
-            //请求的地址
+            // 请求的地址
             String ip = IpUtils.getIpAddr();
             operLog.setOperIp(ip);
             operLog.setOperUrl(StringUtils.substring(ServletUtils.getRequest().getRequestURI(), 0, 255));
 
             if (loginManager != null) {
-                // 改用username字段（假设该字段存储"admin"）
-                operLog.setOperName(loginManager.getUsername());
+                operLog.setOperName(loginManager.getRealName());
                 operLog.setManagerId(loginManager.getId().toString());
             }
 
-            if (e != null){
+            if (e != null) {
                 operLog.setStatus(BusinessStatus.FAIL.ordinal());
                 operLog.setErrorMsg(StringUtils.substring(e.getMessage(), 0, 2000));
             }
-            //设置方法名称
+            // 设置方法名称
             String className = joinPoint.getTarget().getClass().getName();
             String methodName = joinPoint.getSignature().getName();
             operLog.setMethod(className + "." + methodName + "()");
-            //设置请求方式
+            // 设置请求方式
             operLog.setRequestMethod(ServletUtils.getRequest().getMethod());
-            //处理设置注解上的参数
+            // 处理设置注解上的参数
             getControllerMethodDescription(joinPoint, controllerLog, operLog, jsonResult);
-            //设置消耗时间
-            operLog.setCostTime(System.currentTimeMillis()-TIME_THREADLOCAL.get());
-            //保存数据库
+            // 设置消耗时间
+            operLog.setCostTime(System.currentTimeMillis() - TIME_THREADLOCAL.get());
+            // 保存数据库
             operLogService.recordOperLog(operLog);
-        }catch (Exception exp){
-            //记录本地异常日志
-            log.error("异常信息：{}", exp.getMessage());
-        }finally {
+        } catch (Exception exp) {
+            // 记录本地异常日志
+            log.error("异常信息:{}", exp.getMessage());
+        } finally {
             TIME_THREADLOCAL.remove();
         }
     }
-
+    // 暂时未使用，保留方法结构
+    public void getControllerMethodDescription(JoinPoint joinPoint, Log log, OperLog operLog, Object jsonResult) throws Exception {
+        operLog.setTitle(log.title());
+        operLog.setOperType(log.businessType().ordinal());
+        if(log.isSaveRequestData()){
+            setRequestValue(joinPoint, operLog, log.excludeParamNames());
+        }
+        if(log.isSaveResponseData()){
+            operLog.setJsonResult(StringUtils.substring(JSON.toJSONString(jsonResult, excludePropertyPreFilter(EXCLUDE_PROPERTIES)), 0, 2000));
+        }
+    }
 
     private void setRequestValue(JoinPoint joinPoint, OperLog operLog, String[] excludeParamNames) throws Exception {
         Map<?, ?> paramsMap = ServletUtils.getParamMap(ServletUtils.getRequest());
@@ -131,7 +124,6 @@ public class LogAspect {
             operLog.setOperParam(StringUtils.substring(JSON.toJSONString(paramsMap, excludePropertyPreFilter(excludeParamNames)), 0, 2000));
         }
     }
-
     private String argsArrayToString(Object[] paramsArray, String[] excludeParamNames) {
         StringBuilder params = new StringBuilder();
         if (paramsArray != null && paramsArray.length > 0) {
@@ -148,7 +140,7 @@ public class LogAspect {
         return params.toString().trim();
     }
 
-//2.调用敏感词过滤器，将敏感信息排除
+    //2.调用敏感词过滤器，将敏感信息排除
     public PropertyPreExcludeFilter excludePropertyPreFilter(String[] excludeProperties) {
         return new PropertyPreExcludeFilter().addExcludes(ArrayUtils.addAll(EXCLUDE_PROPERTIES, excludeProperties));
     }
