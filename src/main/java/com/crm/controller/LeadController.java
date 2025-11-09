@@ -1,5 +1,6 @@
 package com.crm.controller;
 
+import com.crm.common.aop.Log;
 import com.crm.common.result.PageResult;
 import com.crm.common.result.Result;
 import com.crm.entity.FollowUp;
@@ -34,6 +35,7 @@ public class LeadController {
 
     @PostMapping("page")
     @Operation(summary = "分页查询")
+    @Log(title = "线索列表-分页", businessType = com.crm.enums.BusinessType.SELECT)
     public Result<PageResult<Lead>> getPage(@RequestBody @Validated LeadQuery query) {
         return Result.ok(leadService.getPage(query));
     }

@@ -1,5 +1,6 @@
 package com.crm.controller;
 
+import com.crm.common.aop.Log;
 import com.crm.common.result.PageResult;
 import com.crm.common.result.Result;
 import com.crm.entity.Product;
@@ -26,6 +27,7 @@ public class ProductController {
 
     @PostMapping("page")
     @Operation(summary = "分页查询")
+    @Log(title = "商品列表-分页", businessType = com.crm.enums.BusinessType.SELECT)
     public Result<PageResult<Product>> getPage(@RequestBody @Validated ProductQuery query) {
         return Result.ok(productService.getPage(query));
     }

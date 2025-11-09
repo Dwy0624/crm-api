@@ -1,5 +1,6 @@
 package com.crm.controller;
 
+import com.crm.common.aop.Log;
 import com.crm.common.result.PageResult;
 import com.crm.common.result.Result;
 import com.crm.query.ContractQuery;
@@ -33,6 +34,7 @@ public class ContractController {
 
     @PostMapping("page")
     @Operation(summary = "合同列表-分页")
+    @Log(title = "合同列表-分页", businessType = com.crm.enums.BusinessType.SELECT)
     public Result<PageResult<ContractVO>> getPage(@RequestBody @Validated ContractQuery contractQuery){
         return Result.ok(contractService.getPage(contractQuery));
     }
