@@ -4,7 +4,9 @@ import com.crm.common.aop.Log;
 import com.crm.common.result.PageResult;
 import com.crm.common.result.Result;
 import com.crm.query.ContractQuery;
+import com.crm.query.ContractTrendQuery;
 import com.crm.service.ContractService;
+import com.crm.vo.ContractTrendPieVO;
 import com.crm.vo.ContractVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -16,6 +18,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.rmi.ServerException;
+import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -44,5 +48,12 @@ public class ContractController {
     public Result saveOrUpdate(@RequestBody @Validated ContractVO customerVO) throws ServerException {
         contractService.saveOrUpdate(customerVO);
         return Result.ok();
+    }
+
+    // 合同状态饼图统计接口
+    @PostMapping("/statusPieData")
+    @Operation(summary = "合同状态分布统计（饼图）")
+    public Result<List<ContractTrendPieVO>> getContractStatusPieData() {
+        return Result.ok(contractService.getContractStatusPieData());
     }
 }
