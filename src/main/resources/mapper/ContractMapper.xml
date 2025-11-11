@@ -18,4 +18,13 @@
         GROUP BY status
     </select>
 
+    <select id="countByCreateDate" resultType="int">
+        SELECT COUNT(*) FROM t_contract
+        WHERE DATE(create_time) = #{date}
+    </select>
+
+    <select id="sumAmountByCreateDate" resultType="java.math.BigDecimal">
+        SELECT SUM(amount) FROM t_contract
+        WHERE DATE(create_time) = #{date}
+    </select>
 </mapper>
