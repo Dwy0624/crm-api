@@ -4,6 +4,7 @@ import lombok.Data;
 
 /**
  * 仪表盘响应数据
+ * @author alani
  */
 @Data
 public class DashboardResponse {

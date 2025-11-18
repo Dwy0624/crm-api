@@ -24,4 +24,10 @@ public interface ContractMapper extends MPJBaseMapper<Contract> {
     List<ContractTrendPieVO> countByStatus(@Param("managerId") Integer managerId);
     int countByCreateDate(@Param("date") LocalDate date);
     BigDecimal sumAmountByCreateDate(@Param("date") LocalDate date);
+    // 合同趋势
+    int countByStatusAndDate(
+            @Param("managerId") Integer managerId,
+            @Param("date") String date,
+            @Param("status") Integer status
+    );
 }

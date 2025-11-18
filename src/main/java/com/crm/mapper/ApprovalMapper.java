@@ -1,7 +1,7 @@
 package com.crm.mapper;
 
-import com.crm.entity.Approval;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.crm.entity.Approval;
 
 /**
  * <p>

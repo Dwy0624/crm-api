@@ -2,6 +2,9 @@ package com.crm.mapper;
 
 import com.crm.entity.Manager;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.github.yulichang.interfaces.MPJBaseJoin;
+import org.apache.ibatis.annotations.Param;
+import org.springframework.stereotype.Repository;
 
 /**
  * <p>
@@ -11,6 +14,9 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  * @author crm
  * @since 2025-10-12
  */
+@Repository
 public interface ManagerMapper extends BaseMapper<Manager> {
 
+    // 查询管理员（含邮箱）
+    Manager selectByIdWithEmail(@Param("id") Integer id);
 }
